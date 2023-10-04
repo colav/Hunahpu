@@ -1,6 +1,6 @@
 from nltk import ngrams
 from unidecode import unidecode
-from fuzzywuzzy import fuzz, process
+from thefuzz import fuzz, process
 from langid import classify
 from googletrans import Translator
 
@@ -16,10 +16,14 @@ def __parse_string(text):
     text : str
         text to parse
     '''
-    text = text.lower()
-    text = re.sub(r'[\$_\^]', '', re.sub(r'\\\w+', '', text))
-    return str(text)
+    data = str(text).lower()
+    data = re.sub(r'<[^>]+>', '', data)
+    data = re.sub(r'[\$_\^]', '', re.sub(r'\\\w+', '', data))
+    data = unidecode(data)
+    return data
 
+def parse_string(text):
+    return __parse_string(text)
 
 def __jc_similarity_base(title1, title2, n=3):
     '''
@@ -134,11 +138,11 @@ def __colav_similarity(
     journal2 = paper2['journal']
     year2 = paper2['year']
 
-    if year1:
-        year1 = int(year1)
-    if year2:
-        year2 = int(year2)
-        
+    year_check = False
+    if year1 and year2:
+        if year1 == year2:
+            year_check = True
+
     journal_check = False
     if journal1 and journal2:
         if fuzz.ratio(
@@ -146,10 +150,11 @@ def __colav_similarity(
                 journal1.lower()), unidecode(
                 journal2.lower())) > ratio_thold:
             journal_check = True
-    year_check = False
-    if year1 and year2:
-        if year1 == year2:
-            year_check = True
+
+    length_check = False
+    if len(title1.split()) > 3 and len(title2.split()) > 3:
+        length_check = True
+
     if verbose == 5:
         if journal_check:
             print("Journals are the same")
@@ -159,13 +164,12 @@ def __colav_similarity(
     ratio = fuzz.ratio(title1, title2)
     if verbose == 5:
         print("Initial ratio: ", ratio)
-    if ratio > ratio_thold: 
+    if ratio > ratio_thold and length_check:
         label = True
     else:
         title1_list = title1.split("[")
         title2_list = title2.split("[")
-        if min([len(item) for item in title1_list]) > 10 and min(
-                [len(item) for item in title2_list]) > 10:
+        if min([len(item) for item in title1_list]) > 10 and min([len(item) for item in title2_list]) > 10:
             for title in title1_list:
                 _, ratio = process.extractOne(
                     title, title2_list, scorer=fuzz.ratio)
@@ -181,7 +185,7 @@ def __colav_similarity(
                     if ratio > partial_thold:
                         label = True
                         break
-                    elif ratio < low_thold:
+                    elif ratio > low_thold:
                         if journal_check and year_check:
                             label = True
                             break
@@ -189,24 +193,23 @@ def __colav_similarity(
                     print("partial ratio over list: ", ratio)
 
     # Partial ratio section
-    if not label:
-        
+    if label == False:
+
         ratio = fuzz.partial_ratio(title1, title2)
         if verbose == 5:
             print("partial ratio: ", ratio)
 
-        
-        if ratio > partial_thold:
+        if ratio > partial_thold and length_check:
             label = True
-        elif ratio > low_thold:  
+        elif ratio > low_thold:
             if journal_check and year_check:
                 label = True
 
     # Translation section
-    if label is False and use_translation:  
+    if label is False and use_translation:
         lang1, _ = classify(title1)
         lang2, _ = classify(title2)
-        if lang1 != "en" or lang2 != "en":  
+        if lang1 != "en" or lang2 != "en":
             if lang1 != "en":
                 translator = Translator()
                 try:
@@ -225,19 +228,18 @@ def __colav_similarity(
                 if verbose == 5:
                     print("Title 2 translated to ", title2)
 
-           
             ratio = fuzz.ratio(title1, title2)
             if verbose == 5:
                 print("Ratio over translation: ", ratio)
             if ratio > ratio_thold:
                 label = True
-            if label is False: 
+            if label is False:
                 ratio = fuzz.partial_ratio(title1, title2)
                 if verbose == 5:
                     print("partial ratio over translation: ", ratio)
-                if ratio > partial_thold:  
+                if ratio > partial_thold:
                     label = True
-                elif ratio > low_thold:  
+                elif ratio > low_thold:
                     if journal_check and year_check:
                         label = True
 
@@ -272,6 +274,23 @@ def ColavSimilarity(
     use_parsing: boolean
         use parsing to remove unneeded characters
     '''
+
+    if paper1['title']  is None:
+        paper1['title']  = ""
+    if paper2['title']  is None:
+        paper2['title']  = ""
+    if not isinstance(paper1['journal'], str):
+        paper1['journal'] = str(paper1['journal'])
+    if not isinstance(paper2['journal'], str):
+        paper2['journal'] = str(paper2['journal'])
+
+    paper1['title'] = unidecode(paper1['title'].lower())
+    paper2['title'] = unidecode(paper2['title'].lower())
+
+    if paper1['year']:
+        paper1['year'] = int(paper1['year'])
+    if paper2['year']:
+        paper2['year'] = int(paper2['year'])
 
     label = False
 

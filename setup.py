@@ -65,7 +65,7 @@ def main():
         install_requires=[
             'nltk==3.5',
             'Unidecode<=1.1.1',
-            'fuzzywuzzy==0.18.0',
+            'thefuzz>=0.20.0',
             'langid==1.1.6',
             'googletrans>=3.0.0',
         ],
