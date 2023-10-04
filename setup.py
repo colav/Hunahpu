@@ -63,7 +63,7 @@ def main():
 
         # Dependent packages (distributions)
         install_requires=[
-            'nltk==3.5',
+            'nltk>=3.8.1',
             'Unidecode<=1.1.1',
             'thefuzz>=0.20.0',
             'langid==1.1.6',
