@@ -67,7 +67,7 @@ def main():
             'Unidecode==1.3.7',
             'thefuzz>=0.20.0',
             'langid==1.1.6',
-            'googletrans>=3.0.0',
+            'googletrans==3.1.0a0',
         ],
     )
 
