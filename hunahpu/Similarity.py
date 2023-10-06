@@ -269,7 +269,7 @@ def ColavSimilarity(
         threshold for partial ratio
     low_thold: int
         low threshold for ratios
-    use_translation : str
+    use_translation : boolean
         enable translation support
     use_parsing: boolean
         use parsing to remove unneeded characters
