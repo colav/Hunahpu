@@ -4,7 +4,7 @@
 Colav Similairy
 
 # Description
-Package with customize colav similarity
+Package with customized colav similarity algorithm.
 
 # Installation
 
@@ -33,7 +33,9 @@ else:
     print("The papers are not similar")
 ```
 
+
 it also allows several options for tunning such as:
+```
 ratio_thold: int
     threshold for  ratio matric
 partial_thold: int
@@ -44,7 +46,7 @@ use_translation : str
     enable translation support
 use_parsing: boolean
     use parsing to remove unneeded characters 
-
+```
 example:
 ```python
 from hunahpu.ColavSimilarity import ColavSimilarity
