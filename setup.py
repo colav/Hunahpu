@@ -37,7 +37,7 @@ def main():
         name="Hunahpu",
 
         # Version number (initial):
-        version="0.0.2-alpha",
+        version="0.0.3-alpha",
 
         # Application author details:
         author="Colav",
@@ -63,11 +63,11 @@ def main():
 
         # Dependent packages (distributions)
         install_requires=[
-            'nltk==3.5',
-            'Unidecode<=1.1.1',
-            'fuzzywuzzy==0.18.0',
+            'nltk>=3.8.1',
+            'Unidecode==1.3.7',
+            'thefuzz>=0.20.0',
             'langid==1.1.6',
-            'googletrans>=3.0.0',
+            'googletrans==3.1.0a0',
         ],
     )
 
