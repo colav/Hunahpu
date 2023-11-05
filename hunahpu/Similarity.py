@@ -1,8 +1,6 @@
 from nltk import ngrams
 from unidecode import unidecode
 from thefuzz import fuzz, process
-from langid import classify
-from googletrans import Translator
 
 import re
 
@@ -91,22 +89,6 @@ def JCSimilarity(
             title1), __parse_string(title2), n)
     else:
         S = __jc_similarity_base(title1, title2, n)
-
-    if S < threshold and use_translation:
-        lang, _ = classify(title1)
-        if lang != "en":
-            translator = Translator()
-            title1 = translator.translate(title1).text
-        lang, _ = classify(title2)
-        if lang != "en":
-            translator = Translator()
-            title2 = translator.translate(title2).text
-
-        if use_parsing:
-            S = __jc_similarity_base(__parse_string(
-                title1), __parse_string(title2), n)
-        else:
-            S = __jc_similarity_base(title1, title2, n)
 
     if boolean:
         if S >= threshold:
@@ -204,44 +186,6 @@ def __colav_similarity(
         elif ratio > low_thold:
             if journal_check and year_check:
                 label = True
-
-    # Translation section
-    if label is False and use_translation:
-        lang1, _ = classify(title1)
-        lang2, _ = classify(title2)
-        if lang1 != "en" or lang2 != "en":
-            if lang1 != "en":
-                translator = Translator()
-                try:
-                    title1 = translator.translate(title1).text
-                except Exception as e:
-                    if verbose == 5:
-                        print(e)
-                if verbose == 5:
-                    print("Title 1 translated to ", title1)
-            if lang2 != "en":
-                translator = Translator()
-                try:
-                    title2 = translator.translate(title2).text
-                except Exception as e:
-                    print(e)
-                if verbose == 5:
-                    print("Title 2 translated to ", title2)
-
-            ratio = fuzz.ratio(title1, title2)
-            if verbose == 5:
-                print("Ratio over translation: ", ratio)
-            if ratio > ratio_thold:
-                label = True
-            if label is False:
-                ratio = fuzz.partial_ratio(title1, title2)
-                if verbose == 5:
-                    print("partial ratio over translation: ", ratio)
-                if ratio > partial_thold:
-                    label = True
-                elif ratio > low_thold:
-                    if journal_check and year_check:
-                        label = True
 
     return label
 
