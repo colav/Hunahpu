@@ -37,7 +37,7 @@ def main():
         name="Hunahpu",
 
         # Version number (initial):
-        version="0.0.3-alpha",
+        version="0.0.4-alpha",
 
         # Application author details:
         author="Colav",
