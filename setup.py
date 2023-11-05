@@ -66,8 +66,6 @@ def main():
             'nltk>=3.8.1',
             'Unidecode==1.3.7',
             'thefuzz>=0.20.0',
-            'langid==1.1.6',
-            'googletrans==3.1.0a0',
         ],
     )
 
