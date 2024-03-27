@@ -163,7 +163,7 @@ def __colav_similarity(
             if not label:
                 for title in title1_list:
                     _, ratio = process.extractOne(
-                        title, title2_list, scorer=fuzz.partial_ratio)
+                        title, title2_list, scorer=fuzz.WRatio)
                     if ratio > partial_thold:
                         label = True
                         break
